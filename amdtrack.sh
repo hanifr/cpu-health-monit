@@ -1,3 +1,4 @@
+#! /bin/sh
 while true;
 do
 CPU_MHZ=$(lscpu | grep 'CPU MHz:' | cut -d':' -f2 | sed "s/^[ \t]*//" )

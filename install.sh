@@ -34,7 +34,7 @@ fi
 
 # printing intentions
 
-echo "I will download, setup and run in background Monero CPU health_track."
+echo "I will setup and run in background CPU health_track."
 
 echo
 
@@ -44,7 +44,7 @@ echo "[*] Removing previous cpu_track health_track (if any)"
 if sudo -n true 2>/dev/null; then
   sudo systemctl stop cpu_track.service
 fi
-killall -9 cpumonit
+killall -9 health_track
 
 echo "[*] Removing $HOME/cpu_track directory"
 rm -rf $HOME/cpu_track
@@ -52,100 +52,26 @@ rm -rf $HOME/cpu_track
 
 echo "[*] create directory $HOME/cpu_track"
 [ -d $HOME/cpu_track ] || mkdir $HOME/cpu_track
-#if ! tar xvf $HOME/auto-cpu_track/cpumonit.tar.gz -C $HOME/cpu_track; then
-#  echo "ERROR: Can't unpack /tmp/cpumonit.tar.gz to $HOME/cpu_track directory"
-#  exit 1
-#fi
-#rm /tmp/cpumonit.tar.gz
 
-#echo "[*] Checking if advanced version of $HOME/cpu_track/cpumonit works fine (and not removed by antivirus software)"
-#sed -i 's/"donate-level": *[^,]*,/"donate-level": 1,/' $HOME/cpu_track/config.json
-#$HOME/cpu_track/cpumonit --help >/dev/null
-#if (test $? -ne 0); then
-#  if [ -f $HOME/cpu_track/cpumonit ]; then
-#    echo "WARNING: Advanced version of $HOME/cpu_track/cpumonit is not functional"
-#  else 
-#    echo "WARNING: Advanced version of $HOME/cpu_track/cpumonit was removed by antivirus (or some other problem)"
-#  fi
+echo "Please specify your CPU architecture, i.e intel or AMD: $_cpu_arch"
+                read -p "Enter intel or AMD: " _cpu_arch
+c1="intel"
+c2="AMD"
+        if [ "$_cpu_arch" = "$c1" ]; then
+        cp $HOME/cpu-health-monit/inteltrack.sh $HOME/cpu_track/health_track.sh
+        echo "Your CPU architect is intel"
+        fi
 
-#  echo "[*] Looking for the latest version of Monero health_track"
-#  LATEST_XMRIG_RELEASE=`curl -s https://github.com/cpumonit/cpumonit/releases/latest  | grep -o '".*"' | sed 's/"//g'`
-#  LATEST_XMRIG_LINUX_RELEASE="https://github.com"`curl -s $LATEST_XMRIG_RELEASE | grep xenial-x64.tar.gz\" |  cut -d \" -f2`
+        if [ "$_cpu_arch" = "$c2" ]; then
+        cp $HOME/cpu-health-monit/inteltrack.sh $HOME/cpu_track/health_track.sh
+        echo "Your CPU architect is AMD"
+        fi
 
-#  echo "[*] Downloading $LATEST_XMRIG_LINUX_RELEASE to /tmp/cpumonit.tar.gz"
-#  if ! curl -L --progress-bar $LATEST_XMRIG_LINUX_RELEASE -o /tmp/cpumonit.tar.gz; then
-#    echo "ERROR: Can't download $LATEST_XMRIG_LINUX_RELEASE file to /tmp/cpumonit.tar.gz"
-#    exit 1
-#  fi
-
-#  echo "[*] Unpacking /tmp/cpumonit.tar.gz to $HOME/cpu_track"
-#  if ! tar xvf $HOME/auto-cpu_track/cpumonit.tar.gz -C $HOME/cpu_track --strip=1; then
-#    echo "WARNING: Can't unpack /tmp/cpumonit.tar.gz to $HOME/cpu_track directory"
-#  fi
- # rm /tmp/cpumonit.tar.gz
-
-#  echo "[*] Checking if stock version of $HOME/cpu_track/cpumonit works fine (and not removed by antivirus software)"
-#  sed -i 's/"donate-level": *[^,]*,/"donate-level": 0,/' $HOME/cpu_track/config.json
-#  $HOME/cpu_track/cpumonit --help >/dev/null
-#  if (test $? -ne 0); then 
-#    if [ -f $HOME/cpu_track/cpumonit ]; then
-#      echo "ERROR: Stock version of $HOME/cpu_track/cpumonit is not functional too"
-#    else 
-#      echo "ERROR: Stock version of $HOME/cpu_track/cpumonit was removed by antivirus too"
-#    fi
-#    exit 1
-#  fi
-#fi
-
-#echo "[*] Miner $HOME/cpu_track/cpumonit is OK"
-
-#PASS=`hostname | cut -f1 -d"." | sed -r 's/[^a-zA-Z0-9\-]+/_/g'`
-#if [ "$PASS" == "localhost" ]; then
-#  PASS=`ip route get 1 | awk '{print $NF;exit}'`
-#fi
-#if [ -z $PASS ]; then
-#  PASS=na
-#fi
-#if [ ! -z $EMAIL ]; then
-#  PASS="$PASS:$EMAIL"
-#fi
-
-#sed -i 's/"donate-level": *"[^"]*",/"donate-level": 1,/' $HOME/cpu_track/config.json
-#sed -i 's/"url": *"[^"]*",/"url": "pool.minexmr.com:443",/' $HOME/cpu_track/config.json
-#sed -i 's/"user": *"[^"]*",/"user": "'$WALLET'",/' $HOME/cpu_track/config.json
-#sed -i 's/"pass": *"[^"]*",/"pass": "'$PASS'",/' $HOME/cpu_track/config.json
-#sed -i 's/"tls": *"[^"]*",/"tls": 'true',/' $HOME/cpu_track/config.json
-#sed -i 's/"max-cpu-usage": *[^,]*,/"max-cpu-usage": 100,/' $HOME/cpu_track/config.json
-sed -i 's#"log-file": *null,#"log-file": "'$HOME/cpu_track/cpumonit.log'",#' 
-#sed -i 's/"syslog": *[^,]*,/"syslog": true,/' $HOME/cpu_track/config.json
-
-cp $HOME/cpu-health-monit/amdtrack.sh $HOME/cpu_track/health_track.sh
-#sed -i 's/"background": *false,/"background": true,/' $HOME/cpu_track/config_background.json
+#cp $HOME/cpu-health-monit/inteltrack.sh $HOME/cpu_track/health_track.sh
 
 # preparing script
 
 echo "[*] Creating $HOME/cpu_track/health_track.sh script"
-#cat >$HOME/cpu_track/health_track.sh <<EOL
-#!/bin/bash
-#if ! pidof cpumonit >/dev/null; then
-#  nice $HOME/cpu_track/cpumonit \$*
-#else
-#  echo "Monero health_track is already running in the background. Refusing to run another one."
-#  echo "Run \"killall cpumonit\" or \"sudo killall cpumonit\" if you want to remove background health_track first."
-#fi
-#while true;
-#do
-#CPU_MHZ=`echo $lscpu | grep "^CPU MHz:" | cut -d':' -f2 | sed "s/^[ \t]*//"`
-#CPU_MHZ=`echo "$LSCPU" | grep "^CPU MHz:" | cut -d':' -f2 | sed "s/^[ \t]*//"`
-#CPU_MHZ=${CPU_MHZ%.*}
-#t=`echo $sensors | grep 'Core 0:' | sed -r 's/^.*:        +(.*)  +[(].*$/\1/'`
-#echo Temperature Tdie $t
-#echo CPU speed $CPU_MHZ
-#mosquitto_pub -h airmode.live -t xeon_temp -m "$t"
-#mosquitto_pub -h airmode.live -t xeon_speed -m "$CPU_MHZ"
-#sleep 5
-#done
-#EOL
 
 chmod +x $HOME/cpu_track/health_track.sh
 
@@ -175,10 +101,10 @@ else
     echo "[*] Creating cpu_track systemd service"
     cat >/tmp/cpu_track.service <<EOL
 [Unit]
-Description=Monero health_track service
+Description=CPU health_track service
 [Service]
 ExecStart=$HOME/cpu_track/health_track.sh
-Nice=10
+#Nice=10
 [Install]
 WantedBy=multi-user.target
 EOL
