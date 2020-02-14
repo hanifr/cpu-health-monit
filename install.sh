@@ -33,7 +33,8 @@ if ! which curl >/dev/null; then
 fi
 
 # printing intentions
-
+chmod +x $HOME/cpu-health-monit/dependencies.sh
+. dependencies.sh
 echo "I will setup and run in background CPU health_track."
 
 echo
