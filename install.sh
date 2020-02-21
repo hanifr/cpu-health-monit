@@ -64,7 +64,7 @@ c2="AMD"
         fi
 
         if [ "$_cpu_arch" = "$c2" ]; then
-        cp $HOME/cpu-health-monit/inteltrack.sh $HOME/cpu_track/health_track.sh
+        cp $HOME/cpu-health-monit/amdtrack.sh $HOME/cpu_track/health_track.sh
         echo "Your CPU architect is AMD"
         fi
 
